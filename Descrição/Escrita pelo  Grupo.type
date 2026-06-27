@@ -1,0 +1,98 @@
+# 🌱 AgroNexus — Documentação do Projeto
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 1. Ideia Principal
+A ideia principal do trabalho foi criar um Arduino com a função de medir
+a temperatura do solo e a umidade do ar.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 2. Como essa ideia surgiu?
+A ideia surgiu através do meu colega Marcos, que criou um site no Code Race
+para ajudar pessoas que lidam com plantação. A partir disso, desenvolvemos
+uma solução em hardware com Arduino.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 3. Por que a dupla escolheu essa proposta?
+Porque ambos se agradaram da ideia e perceberam que seria muito útil
+para quem trabalha com agricultura.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 4. Qual situação ou necessidade será trabalhada?
+A necessidade de plantar na hora certa, para que no futuro resulte
+em uma ótima colheita.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 5. Descrição do Problema
+Muitas pessoas que trabalham com plantações têm dificuldades para saber
+o momento ideal de plantar ou cuidar das culturas.
+
+A temperatura do solo e a umidade do ar influenciam diretamente no
+crescimento das plantas e na qualidade da colheita.
+
+A solução poderá ser utilizada por:
+- Agricultores
+- Produtores rurais
+- Pessoas que cultivam hortas
+
+Se aplicada na prática, poderá ajudar a melhorar a produção
+e reduzir perdas nas plantações.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 6. Planejamento da Solução
+A solução mede a temperatura do solo e a umidade do ar utilizando
+sensores conectados a um Arduino.
+
+As informações coletadas são exibidas em um painel web moderno,
+acessível pelo Google Chrome via conexão USB.
+
+Os sensores enviam os dados para o Arduino, que faz a leitura
+e mostra os resultados ao usuário em tempo real.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 7. Decomposição do Projeto                          
+Pesquisar os sensores necessários
+Montar o circuito no Arduino
+Programar a leitura dos sensores
+Coletar os dados de temperatura e umidade
+Processar as informações
+Exibir os resultados para o usuário
+Testar o funcionamento do sistema
+Fazer ajustes e melhorias
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 8. Simulação e Protótipo
+**O que foi simulado:**
+O funcionamento do Arduino realizando a leitura da temperatura do solo
+e da umidade do ar, exibindo os resultados ao usuário em tempo real
+através de um painel web.
+
+**O que a dupla iniciou:**
+- Pesquisa dos componentes necessários
+- Planejamento do circuito
+- Programação básica para leitura dos sensores
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 9. Conclusão
+Durante o desenvolvimento do trabalho, aprendemos como o Arduino pode
+ser utilizado para resolver problemas relacionados à agricultura.
+
+O pensamento computacional ajudou a organizar as etapas do projeto,
+facilitando a divisão das tarefas e o planejamento da solução.
+
+A solução criada funcionou de acordo com o esperado, permitindo a leitura
+da temperatura do solo e da umidade do ar em tempo real.
+
+**Melhorias futuras:**
+- Alertas automáticos para o agricultor
+- Armazenamento histórico dos dados
+- Integração com aplicativos mobile
+- Conectividade Wi-Fi para acesso remoto
