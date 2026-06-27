@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroNexus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --verde-escuro: #0d2b12;
+            --verde-meio: #1a4a22;
+            --verde-vivo: #22c55e;
+            --verde-claro: #bbf7d0;
+            --terra: #92400e;
+            --laranja: #f97316;
+            --azul: #3b82f6;
+            --fundo: #f7faf8;
+            --branco: #ffffff;
+            --cinza: #6b7280;
+            --borda: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--fundo);
+            color: var(--verde-escuro);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: var(--verde-escuro);
+            padding: 0 32px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo em { font-style: normal; color: var(--verde-vivo); }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--verde-claro);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #4b5563;
+            transition: background 0.3s;
+        }
+
+        .dot.conectado { background: var(--verde-vivo); animation: pulsar 1.5s infinite; }
+        .dot.erro      { background: #ef4444; }
+
+        @keyframes pulsar {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.4; }
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 60px 20px;
+            text-align: center;
+            gap: 24px;
+        }
+
+        .hero-icon { font-size: 64px; line-height: 1; }
+
+        .hero h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--verde-escuro);
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 15px;
+            color: var(--cinza);
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .btn-conectar {
+            background: var(--verde-vivo);
+            color: var(--verde-escuro);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-conectar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+        }
+
+        .aviso-chrome { font-size: 12px; color: #9ca3af; }
+
+        .dashboard { display: none; flex: 1; flex-direction: column; }
+        .dashboard.visivel { display: flex; }
+
+        .dash-header {
+            padding: 28px 32px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .dash-header h2 { font-size: 22px; font-weight: 700; color: var(--verde-escuro); }
+        .dash-header span { font-size: 13px; color: var(--cinza); font-family: 'JetBrains Mono', monospace; }
+
+        .btn-desconectar {
+            background: transparent;
+            border: 1px solid var(--borda);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: var(--cinza);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-desconectar:hover { border-color: #ef4444; color: #ef4444; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            padding: 24px 32px 32px;
+        }
+
+        .card {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 28px 24px;
+            border: 1px solid var(--borda);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card.solo::after  { background: linear-gradient(90deg, #92400e, #d97706); }
+        .card.temp::after  { background: linear-gradient(90deg, #ea580c, #fbbf24); }
+        .card.umid::after  { background: linear-gradient(90deg, #2563eb, #06b6d4); }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; }
+
+        .card-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--cinza);
+        }
+
+        .card-emoji { font-size: 28px; }
+
+        .card-valor {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            line-height: 1;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .card-unidade { font-size: 22px; font-weight: 400; color: var(--cinza); margin-bottom: 6px; }
+
+        .barra-bg { background: #f3f4f6; border-radius: 999px; height: 6px; overflow: hidden; }
+
+        .barra-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(.4,0,.2,1);
+        }
+
+        .card.solo .barra-fill { background: linear-gradient(90deg, #92400e, #d97706); }
+        .card.temp .barra-fill { background: linear-gradient(90deg, #ea580c, #fbbf24); }
+        .card.umid .barra-fill { background: linear-gradient(90deg, #2563eb, #06b6d4); }
+
+        .msg-erro {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: #dc2626;
+            font-size: 14px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .msg-erro.visivel { display: block; }
+
+        footer {
+            background: var(--branco);
+            border-top: 1px solid var(--borda);
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #9ca3af;
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">🌱 Agro<em>Nexus</em></div>
+    <div class="status-badge">
+        <div class="dot" id="dot"></div>
+        <span id="status-texto">Desconectado</span>
+    </div>
+</nav>
+
+<div class="hero" id="tela-inicio">
+    <div class="hero-icon">🌿</div>
+    <h1>Monitoramento<br>AgroNexus</h1>
+    <p>Conecte o Arduino Mega via USB e clique no botão abaixo para começar o monitoramento em tempo real.</p>
+    <button class="btn-conectar" onclick="conectar()">🔌 Conectar Arduino</button>
+    <div class="msg-erro" id="msg-erro">⚠️ Erro ao conectar. Verifique se o Arduino está ligado no USB e tente novamente.</div>
+    <p class="aviso-chrome">⚡ Funciona apenas no Google Chrome</p>
+</div>
+
+<div class="dashboard" id="dashboard">
+    <div class="dash-header">
+        <div>
+            <h2>Monitoramento em Tempo Real</h2>
+            <span>Arduino Mega via USB — Web Serial API</span>
+        </div>
+        <button class="btn-desconectar" onclick="desconectar()">Desconectar</button>
+    </div>
+
+    <div class="cards">
+        <div class="card solo">
+            <div class="card-top">
+                <span class="card-label">Umidade do Solo</span>
+                <span class="card-emoji">🌱</span>
+            </div>
+            <div class="card-valor">
+                <span id="val-solo">--</span>
+                <span class="card-unidade">%</span>
+            </div>
+            <div class="barra-bg">
+                <div class="barra-fill" id="bar-solo" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div class="card temp">
+            <div class="card-top">
+                <span class="card-label">Temperatura do Ar</span>
+                <span class="card-emoji">🌡️</span>
+            </div>
+            <div class="card-valor">
+                <span id="val-temp">--</span>
+                <span class="card-unidade">°C</span>
+            </div>
+            <div class="barra-bg">
+                <div class="barra-fill" id="bar-temp" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div class="card umid">
+            <div class="card-top">
+                <span class="card-label">Umidade do Ar</span>
+                <span class="card-emoji">💧</span>
+            </div>
+            <div class="card-valor">
+                <span id="val-umid">--</span>
+                <span class="card-unidade">%</span>
+            </div>
+            <div class="barra-bg">
+                <div class="barra-fill" id="bar-umid" style="width:0%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <span>AgroNexus © 2026</span>
+    <span id="ultima-atualizacao">Aguardando dados...</span>
+</footer>
+
+<script>
+    let porta = null;
+    let leitor = null;
+    let lendo = false;
+
+    function setStatus(texto, tipo) {
+        document.getElementById('dot').className = 'dot ' + (tipo || '');
+        document.getElementById('status-texto').textContent = texto;
+    }
+
+    async function conectar() {
+        document.getElementById('msg-erro').classList.remove('visivel');
+        try {
+            porta = await navigator.serial.requestPort();
+            await porta.open({ baudRate: 9600 });
+            setStatus('Conectado', 'conectado');
+            document.getElementById('tela-inicio').style.display = 'none';
+            document.getElementById('dashboard').classList.add('visivel');
+            lendo = true;
+            lerDados();
+        } catch (e) {
+            document.getElementById('msg-erro').classList.add('visivel');
+            setStatus('Erro de conexão', 'erro');
+        }
+    }
+
+    async function lerDados() {
+        const decoder = new TextDecoderStream();
+        porta.readable.pipeTo(decoder.writable);
+        leitor = decoder.readable.getReader();
+        let buffer = '';
+        while (lendo) {
+            try {
+                const { value, done } = await leitor.read();
+                if (done) break;
+                buffer += value;
+                const linhas = buffer.split('\n');
+                buffer = linhas.pop();
+                for (const linha of linhas) {
+                    const txt = linha.trim();
+                    if (txt.startsWith('{') && txt.endsWith('}')) {
+                        try {
+                            const dados = JSON.parse(txt);
+                            atualizarDashboard(dados);
+                        } catch (_) {}
+                    }
+                }
+            } catch (e) {
+                if (lendo) setStatus('Conexão perdida', 'erro');
+                break;
+            }
+        }
+    }
+
+    function atualizarDashboard(dados) {
+        const solo = parseInt(dados.solo ?? 0);
+        const temp = parseFloat(dados.temp ?? 0).toFixed(1);
+        const umid = parseFloat(dados.umid ?? 0).toFixed(1);
+        document.getElementById('val-solo').textContent = solo;
+        document.getElementById('val-temp').textContent = temp;
+        document.getElementById('val-umid').textContent = umid;
+        document.getElementById('bar-solo').style.width = Math.min(solo, 100) + '%';
+        document.getElementById('bar-temp').style.width = Math.min(temp / 50 * 100, 100) + '%';
+        document.getElementById('bar-umid').style.width = Math.min(umid, 100) + '%';
+        document.getElementById('ultima-atualizacao').textContent =
+            'Última atualização: ' + new Date().toLocaleTimeString('pt-BR');
+    }
+
+    async function desconectar() {
+        lendo = false;
+        try {
+            if (leitor) await leitor.cancel();
+            if (porta) await porta.close();
+        } catch (_) {}
+        porta = null; leitor = null;
+        setStatus('Desconectado', '');
+        document.getElementById('dashboard').classList.remove('visivel');
+        document.getElementById('tela-inicio').style.display = '';
+        document.getElementById('ultima-atualizacao').textContent = 'Aguardando dados...';
+    }
+</script>
+
+</body>
+</html>
