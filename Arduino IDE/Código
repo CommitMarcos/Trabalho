@@ -1,0 +1,87 @@
+/*
+ * AgroNexus - Firmware Arduino Mega
+ * 
+ * Conexões:
+ *   DHT11  → Pino 2 (dados), VCC, GND
+ *   Sensor de Umidade do Solo (I2C) → Pino 20 (SDA), Pino 21 (SCL), VCC, GND
+ * 
+ * Saída: JSON via Serial (USB) a cada 2 segundos
+ * Formato: {"solo":XX,"temp":XX.X,"umid":XX.X}
+ */
+
+#include <DHT.h>
+#include <Wire.h>
+
+// --- Configurações do DHT11 ---
+#define DHT_PINO   2
+#define DHT_TIPO   DHT11
+DHT dht(DHT_PINO, DHT_TIPO);
+
+// --- Endereço I2C padrão do sensor capacitivo de solo ---
+// Sensores STEMMA QT / Seesaw da Adafruit usam 0x36
+// Sensores genéricos de capacitância I2C costumam usar 0x20
+// Ajuste se necessário
+#define ENDERECO_SOLO  0x36
+
+// Variável para guardar o valor de umidade do solo (0–100)
+int umidadeSolo = 0;
+
+// -------------------------------------------------------
+// Função auxiliar: lê o sensor capacitivo via I2C raw
+// Retorna valor bruto de 16 bits (0–1023 típico)
+// -------------------------------------------------------
+uint16_t lerSensorSoloRaw() {
+  Wire.beginTransmission(ENDERECO_SOLO);
+  Wire.write(0x0F);  // Registrador de leitura de capacitância
+  Wire.write(0x10);
+  if (Wire.endTransmission() != 0) {
+    return 0; // Sensor não respondeu
+  }
+  delay(5);
+  Wire.requestFrom(ENDERECO_SOLO, (uint8_t)2);
+  if (Wire.available() < 2) return 0;
+  uint16_t val = ((uint16_t)Wire.read() << 8) | Wire.read();
+  return val;
+}
+
+// -------------------------------------------------------
+// Converte valor bruto para percentual (0–100)
+// Calibre SECO e MOLHADO conforme seu sensor
+// -------------------------------------------------------
+int converterParaPercent(uint16_t raw) {
+  const uint16_t SECO   = 800;  // Valor lido no ar / solo seco
+  const uint16_t MOLHADO = 400; // Valor lido no solo muito úmido
+  if (raw >= SECO)    return 0;
+  if (raw <= MOLHADO) return 100;
+  return map(raw, SECO, MOLHADO, 0, 100);
+}
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin(); // Inicia I2C nos pinos 20 (SDA) e 21 (SCL) do Mega
+  dht.begin();
+  delay(2000); // Aguarda DHT11 estabilizar
+}
+
+void loop() {
+  // --- Leitura do DHT11 ---
+  float temperatura = dht.readTemperature();
+  float umidadeAr   = dht.readHumidity();
+
+  // Substitui NaN por 0 em caso de falha de leitura
+  if (isnan(temperatura)) temperatura = 0.0;
+  if (isnan(umidadeAr))   umidadeAr   = 0.0;
+
+  // --- Leitura do sensor de solo ---
+  uint16_t raw = lerSensorSoloRaw();
+  umidadeSolo  = converterParaPercent(raw);
+
+  // --- Envia JSON pela Serial (USB para o Python) ---
+  Serial.print("{");
+  Serial.print("\"solo\":");  Serial.print(umidadeSolo);
+  Serial.print(",\"temp\":"); Serial.print(temperatura, 1);
+  Serial.print(",\"umid\":"); Serial.print(umidadeAr, 1);
+  Serial.println("}");
+
+  delay(2000); // Aguarda 2 segundos antes da próxima leitura
+}
