@@ -112,7 +112,3 @@ Instale pela IDE em **Ferramentas → Gerenciar Bibliotecas**:
 - Se o solo mostrar 0%, calibre os valores `SECO` e `MOLHADO` no `agronexus.ino`
 
 ---
-
-## 📄 Licença
-
-Projeto acadêmico desenvolvido para disciplina de sistemas embarcados — 2026.
